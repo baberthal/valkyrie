@@ -62,6 +62,7 @@ stopProcess()
 #include "utils/vglogreader.h"
 #include "options/vk_option.h"   // PERROR* and friends
 //#include "vk_file_utils.h"       // FileCopy()
+#include <unistd.h> // usleep()
 
 #include <QApplication>
 #include <QDir>
@@ -167,7 +168,7 @@ void ToolObject::setProcessId( int procId )
 {
    vk_assert( procId >= VGTOOL::PROC_NONE );
    vk_assert( procId <  VGTOOL::PROC_MAX );
-   
+
    processId = procId;
    emit running( isRunning() );
 }
@@ -179,7 +180,7 @@ int ToolObject::getProcessId()
 {
    vk_assert( processId >= VGTOOL::PROC_NONE );
    vk_assert( processId <  VGTOOL::PROC_MAX );
-   
+
    return processId;
 }
 
@@ -189,7 +190,7 @@ void ToolObject::deleteView()
 {
    emit message( "" );  /* clear the status bar */
    vk_assert( m_view != 0 );
-   
+
    m_view->close( true/*alsoDelete*/ );
    m_view = 0;
 }
@@ -205,12 +206,12 @@ ToolView* ToolObject::view()
 QStringList ToolObject::getVgFlags()
 {
    QStringList modFlags;
-   
+
    foreach( VkOption * opt, options.getOptionHash() ) {
-   
+
       QString defVal = opt->dfltValue.toString();
       QString cfgVal = vkCfgProj->value( opt->configKey() ).toString();
-      
+
       if ( defVal != cfgVal ) {
          modFlags << "--" + opt->longFlag + "=" + cfgVal;
       }
@@ -285,7 +286,7 @@ bool ToolObject::parseLogFile()
    // log file ok
    log_file = ret_file;
    vkCfgProj->setValue( "valkyrie/view-log", log_file );
-   
+
    // Could be a very large file, so at least get ui up-to-date now
    qApp->processEvents( QEventLoop::AllEvents, 1000/*max msecs*/ );
 
